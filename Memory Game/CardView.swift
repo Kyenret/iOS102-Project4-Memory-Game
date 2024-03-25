@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CardView: View {
-    @State var card: Card
+    let card: Card
     let onTap: () -> Void // Add onTap closure
     //let onTap: () -> Void // Add onTap closure
     @State private var isFaceDown = true //initial state is face down
@@ -45,8 +45,15 @@ struct CardView: View {
         .opacity(card.isMatched ? 0 : 1.0) // Dim the card if it's selected
         .onTapGesture {
             onTap() //notifying when a specific card has been tapped
-            flipCard()
+            withAnimation {
+                flipCard()
+            }
         }
+        .rotation3DEffect(
+            .degrees(isFaceDown ? 0 : 180),
+            axis: (x: 0.0, y: 1.0, z: 0.0)
+        )
+        //.animation(.easeInOut(duration: 0.5))
     }
     // Function to flip the card
     private func flipCard() {
@@ -55,24 +62,33 @@ struct CardView: View {
 }
 // Card data model
 struct Card: Equatable {
+    let id = UUID()
     let emoji: String
     var isMatched: Bool = false // Add isMatched property
     var isFaceDown: Bool = true // Add isFaceDown  property
     
-    static let mockedCards = [
-        Card(emoji: "😂"),
-        Card(emoji: "🥺"),
-        Card(emoji: "😘"),
-        Card(emoji: "😞"),
-        Card(emoji: "😬"),
-        Card(emoji: "😊"),
-        Card(emoji: "😂"),
-        Card(emoji: "🥺"),
-        Card(emoji: "😘"),
-        Card(emoji: "😞"),
-        Card(emoji: "😬"),
-        Card(emoji: "😊")
-        ]
+    static func generatePairs(count: Int) -> [Card] {
+            var emojis = ["😂", "🥺", "😘", "😞", "😬", "😊", "🫣", "💕", "👀", "😑"]
+            emojis = Array(emojis.prefix(count))
+            emojis += emojis
+            emojis.shuffle()
+            
+            return emojis.map { Card(emoji: $0) }
+        }
+//    static let mockedCards = [
+//        Card(emoji: "😂"),
+//        Card(emoji: "🥺"),
+//        Card(emoji: "😘"),
+//        Card(emoji: "😞"),
+//        Card(emoji: "😬"),
+//        Card(emoji: "😊"),
+//        Card(emoji: "😂"),
+//        Card(emoji: "🥺"),
+//        Card(emoji: "😘"),
+//        Card(emoji: "😞"),
+//        Card(emoji: "😬"),
+//        Card(emoji: "😊")
+//        ]
 }
 
 //Preview {
